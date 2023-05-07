@@ -28,12 +28,19 @@ for record in data:
     session.add(model(id=record.get('pk'), **record.get('fields')))
 session.commit()
 
-author = input('Введите имя автора(пример: Pearson или Reilly , чтобы узнать продажи :  ')
+author = input('Введите ID или имя автора(пример: Pearson или Reilly или 1 или 2 , чтобы узнать продажи :  ')
+if author.isalnum():
+    subq = session.query(Publisher.name).filter(Publisher.name.ilike(f'%{author}%')).subquery()
+    for c in session.query(Book.title, Shop.name, Sale.price, Sale.date_sale).join(Book.publisher).join(Stock).join(Shop).\
+            join(Sale).join(subq, Publisher.name.ilike(f'%{author}%')):
+        print(f'{c[0]:<40}| {c[1]:<10}| {c[2]:<10}| {c[3]}')
+if author.isdigit():
+    subq = session.query(Publisher.id).filter(Publisher.id == author).subquery()
+    for c in session.query(Book.title, Shop.name, Sale.price, Sale.date_sale).join(Book.publisher).join(Stock).join(
+            Shop). \
+            join(Sale).join(subq, Publisher.id== author):
+        print(f'{c[0]:<40}| {c[1]:<10}| {c[2]:<10}| {c[3]}')
 
-subq = session.query(Publisher.name).filter(Publisher.name.ilike(f'%{author}%')).subquery()
-for c in session.query(Book.title, Shop.name, Sale.price, Sale.date_sale).join(Book.publisher).join(Stock).join(Shop).\
-        join(Sale).join(subq, Publisher.name.ilike(f'%{author}%')):
-    print(f'{c[0]:<40}| {c[1]:<10}| {c[2]:<10}| {c[3]}')
 
 
 session.close()

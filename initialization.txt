@@ -1,2 +1,2 @@
 # вместо этих строк введите через пробел : password от posgress, login от postgress, название БД.
-# пример : password123 postgres book_store
+# пример : afrosjar123 postgres book_store
